@@ -9,16 +9,15 @@ $password_wifiAtt = "abc123";
 
 define("ENCRYPTION_KEY", "!@#$%^&*");
 
-//try {
+try {
     $db = new PDO("mysql:host=$hostname_wifiAtt;dbname=archery_scoring_2015", $username_wifiAtt, $password_wifiAtt);
 //    $stmtSelect = $db->prepare("select max(player_id) as currentId from players ");        
 //      $stmtSelect->execute();
 //      $stmtSelect->fe
-
-//catch(PDOException $e)
-//    {
-//    echo $e->getMessage();
-//    }
+}
+catch(PDOException $e) {
+    echo $e->getMessage();
+}
 
 function encrypt($dataString) {
     $key_value = "PASSWORD"; 
