@@ -1,0 +1,120 @@
+<?php
+include '../Connections/wifiAtt.php';
+?>
+<?php
+//  $hostname_wifiAtt = "localhost";
+//  $database_wifiAtt = "archery_scoring";
+//  $username_wifiAtt = "root";
+//  $password_wifiAtt = "";
+//  $db = new PDO("mysql:host=$hostname_wifiAtt;dbname=archery_scoring", $username_wifiAtt, $password_wifiAtt);
+  if(isset($_GET['action']))
+  {
+      if($_GET['action']=='Delete')
+      {
+          $stmt = $db->prepare("delete from category where range_Id = :range_id ");
+          $stmt->execute(array(':range_id' => $_GET['pk']));
+      }
+  }
+  
+  if(isset($_POST['btnSubmit']))
+      {
+        try{
+          
+          $stmt = $db->prepare("INSERT into category (categories,`range`,shoot_qty ) VALUES (:categories,:range,:shoot_qty) ");
+
+          $stmt->execute(array(':categories' => $_POST['slctCat'], ':range'=> $_POST['txtBoxRange'], ':shoot_qty'=> $_POST['txtBoxShootQty'] ));
+          echo $stmt->rowCount().' were affected' ;
+        }
+        catch (Exception $ish)
+        {
+            echo 'Ada exception!:'.$ish->getMessage();
+        }
+      }
+  
+  $stmtSelect = $db->prepare("SELECT * from category ");
+
+  $stmtSelect->execute();
+
+  $row_RecordsetCat = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+  $cntRow = $stmtSelect -> rowCount();
+  
+    
+      
+      
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+        <link rel="stylesheet" href="../css/jquery-ui.css" />
+        <link rel="stylesheet" href="../css/style_1.css" />
+        <script type="text/javascript" src="../js/jquery-1.9.1.min.js" ></script>
+        <script type="text/javascript" src="../js/jquery-ui.js" ></script>
+    </head>
+    <body>
+        <form name="frmRangeConfig" method="post">
+        <table>
+            <tr>
+                <td>Range: </td>
+                <td><div id="notification" name="notification"><input type="text" id="txtBoxRange" name="txtBoxRange"></div></td>
+            </tr>
+            <tr>
+                <td>Category: </td>
+                <td><select id="slctCat" name="slctCat" >
+                        <?php 
+                    $stmtSelect = $db->prepare("SELECT bow_category from bowcategories ");
+                    $stmtSelect->execute();
+                    $row_RecordsetBowCat = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    foreach($row_RecordsetBowCat as $row)
+                    {  ?>
+                        <option value="<?php echo $row['bow_category'] ?>"><?php echo $row['bow_category'] ?></option>
+                <?php    }
+                ?>
+                    </select>
+                        
+                </td>
+            </tr>
+            <tr>
+                <td>Shooting Qty: </td>
+                <td><input type="text" id="txtBoxShootQty" name="txtBoxShootQty"></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit" id="btnSubmit" name="btnSubmit" ></td>
+            </tr>
+        </table>
+        </form>
+        <br><br>
+         <?php
+
+            if($cntRow >0)
+            {
+        ?>
+        <table>
+            <tr style="background-color:#57B6E2 ">
+                <td>Range</td>
+                <td>Category</td>
+                <td>Shooting Qty</td>
+            </tr>
+            <?php
+                $cnt = 1;
+                foreach( $row_RecordsetCat as $rowCat )
+                {  ?>
+            <tr style="background-color:<?php echo ($cnt%2==1 ? "#A1CCE4" : "#E9E5FD") ?>">
+                <td><?php echo $rowCat['range'];   ?></td>
+                <td><?php echo $rowCat['categories']  ?></td>
+                <td><?php echo $rowCat['shoot_qty']  ?></td>
+                <td><a href="rangeConfig.php?action=Delete&pk=<?php echo $rowCat['range_Id']  ?>">Delete</a></td>
+            </tr>    
+                    <?php
+                  $cnt++;  
+                }
+            ?>
+        </table>
+        <?php
+            }
+        ?>
+        
+    </body>
+</html>

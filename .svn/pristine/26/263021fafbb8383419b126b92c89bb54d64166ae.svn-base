@@ -1,0 +1,58 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+    </head>
+    <body><div align="center">
+         <table>
+            <form method="POST">
+            <tr style="background-color:#57B6E2 ">
+                <td>Archer No</td>
+                <td>Archer Name</td>
+                <td>Gender</td>
+                <td>Category</td>
+                <td>Team</td>
+            </tr>
+         <?php
+include '../Connections/dbConnMysqli.php';
+
+$qryBowCat = "Select bow_category from bowcategories";
+$allBowCat = mysqli_query($wifiAtt,$qryBowCat);
+$rekodSetsBowCat = mysqli_fetch_all($allBowCat,MYSQLI_ASSOC);
+
+$mainCounter = 0;
+$cnt=1;
+foreach($rekodSetsBowCat as $row)
+{
+
+
+	$querySortedPlayer = "select * from players where player_bow_cat = '".$row['bow_category']."' ORDER BY player_bow_cat desc,player_gender desc, team asc";
+	$allPlayer = mysqli_query($wifiAtt, $querySortedPlayer);
+	$row_RecordsetPlayers = mysqli_fetch_all($allPlayer,MYSQLI_ASSOC);
+
+	foreach($row_RecordsetPlayers as $rowPlayers)
+	{		           
+                ?>
+            <tr style="background-color:<?php echo ($cnt%2==1 ? "#A1CCE4" : "#E9E5FD") ?>">
+                <td><?php echo $rowPlayers['player_no']; ?>  </td>
+                <td><?php echo $rowPlayers['player_name'];  ?></td>
+                <td><?php echo $rowPlayers['player_gender'];  ?></td>
+                <td><?php echo $rowPlayers['player_bow_cat'];  ?></td>
+                <td><?php echo $rowPlayers['team'];  ?></td>
+            </tr>    
+            
+       <?php
+        $cnt++;
+	}  ?>
+            
+<?php	
+}
+?>
+ </div>
+    </body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Geolocation try out</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>TODO write content
+            <br>
+            <button onclick="fnGetLocation()">Tekang!</button>
+            
+            <p id="demoss"></p>
+        </div>
+        <br>
+        <br>
+        <div id="cvsDrag" ondrop="drop(event)" ondragover="event.preventDefault()"  style="border: #008000 solid; height:350px">
+            
+        </div>
+        
+        <img src="html5stuff/img_the_scream.jpg" draggable="true" ondragstart="event.dataTransfer.setData('Text', event.target.id)" id="img1">
+        
+    </body>
+    <script type="text/javascript">
+        
+        var x = document.getElementById("demoss");
+        function fnGetLocation()
+        {
+            if(navigator.geolocation)
+            {
+                //var position = navigator.geolocation.getCurrentPosition();
+                //showPosition(position)
+                navigator.geolocation.getCurrentPosition(showPosition);
+                
+            }
+            else
+            {
+                x.innerHTML = "Geolocation is not supported lerr"
+            }
+        }
+        
+        function showPosition(position)
+        {
+            x.innerHTML = "Latitude: " + position.coords.latitude + "<br> Longitude:" + position.coords.longitude; 
+            
+            
+        }
+        
+        function drop(event)
+        {
+            event.preventDefault();
+            var data = event.dataTransfer.getData("Text");
+            event.target.appendChild(document.getElementById(data));
+        }
+        
+    </script>
+</html>

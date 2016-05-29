@@ -1,0 +1,185 @@
+<?php
+include '../Connections/wifiAtt.php';
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+        <link rel="stylesheet" href="../css/jquery-ui.css" />
+        <link rel="stylesheet" href="../css/style_1.css" />
+        <script type="text/javascript" src="../js/jquery-1.9.1.min.js" ></script>
+        <script type="text/javascript" src="../js/jquery-ui.js" ></script>
+        
+    </head>
+    <body>
+        <script type="text/javascript">
+            $(function (){
+             $('#txtBoxArcherNo').autocomplete({ 
+                 source:"../generalFN/genericFn.php",
+                 minLength:1
+             })   
+            });
+            $(document).ready(function() {
+                $('#txtBoxArcherNo').blur(function(){
+                    $("#frmAddScore").css("display","none");
+                    $.ajax({
+                        url:'../generalFN/genericFn.php',
+                        dataType: "json",
+                        cache: false,
+                        data:{action:'getArcherInfo',archerNo:$('#txtBoxArcherNo').val()},
+                        type:'post',
+                        success:function(response){
+                            $('#txtBoxArcherName').val(response.archerName);
+                            $('#txtBoxGender').val(response.archerGender);
+                            $('#txtBoxCat').val(response.archerCat);
+                            $('#txtBoxTeam').val(response.archerTeam);
+                            if(response.archerName == null || response.archerName == "")
+                                $('#btnSubmit').attr('disabled','disabled');
+                            else
+                                {
+                                $('#btnSubmit').removeAttr('disabled');
+                                $('#slctCat').removeAttr('disabled');
+                                }
+                        }
+                    });
+                });
+            });
+        </script>
+        <form method="POST">
+        <table>
+            <tr>
+                <td>Archer No: </td>
+                <td><div id="notification" name="notification"><input type="text" class="txtBoxUpperCase" id="txtBoxArcherNo" name="txtBoxArcherNo" value="<?php echo ($_POST == null ? "" : $_POST['txtBoxArcherNo']) ?>"></div></td>
+            </tr>
+            <tr>
+                <td>Archer Name: </td>
+                <td><input type="text" id="txtBoxArcherName" name="txtBoxArcherName" readonly="true" value="<?php echo ($_POST == null ? "" : $_POST['txtBoxArcherName']) ?>"></td>
+            </tr>
+            <tr>
+                <td>Gender: </td>
+                <td><input type="text" id="txtBoxGender" name="txtBoxGender" readonly="true" value="<?php echo ($_POST == null ? "" : $_POST['txtBoxGender']) ?>">
+                    </select></td>
+            </tr>
+             <tr>
+                <td>Category: </td>
+                <td><input type="text" id="txtBoxCat" name="txtBoxCat" readonly="true" value="<?php echo ($_POST == null ? "" : $_POST['txtBoxCat']) ?>"></td>
+            </tr>
+            <tr>
+                <td>Team: </td>
+                <td><input type="text" id="txtBoxTeam" name="txtBoxTeam" readonly="true" value="<?php echo ($_POST == null ? "" : $_POST['txtBoxTeam']) ?>"></td>
+            </tr>
+            <?php
+            $stmtSelect = $db->prepare("SELECT * from category ");
+            
+            $stmtSelect->execute();
+
+            $recordSetCategory = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+            $cntRow = $stmtSelect -> rowCount();
+            
+        ?>
+            <tr>
+                <td>Range Category: </td>
+                <td><select id="slctCat" name="slctCat" <?php echo ( isset($_POST['btnSubmit'])? "disabled" : "") ?> >
+                        <?php foreach ($recordSetCategory as $rowCat) {   ?>
+                        <option value="<?php echo $rowCat['range_Id'] ?>" <?php if(isset($_POST['slctCat']))
+                            {  echo ($rowCat['range_Id']==$_POST['slctCat']? "selected":"") ; }   ?> >
+                                <?php echo $rowCat['range']."-".$rowCat['categories'] ?></option>   
+                        <?php  } ?>
+                    </select></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit" id="btnSubmit" name="btnSubmit" value="Confirmed Category & Start Scoring!" disabled="disabled"></td>
+            </tr>
+        </table>
+        </form>
+        
+        <br> 
+        <?php if(isset($_POST['btnSubmit'] )) 
+        {
+           $qrySelCat = "Select shoot_qty from category where range_Id = :range_Id "; 
+           $fetchQry = $db->prepare($qrySelCat);
+           $fetchQry->execute(array('range_Id'=>$_POST['slctCat']));
+           $recordSet = $fetchQry->fetch();
+           
+           $cntArrow = $recordSet['shoot_qty'];
+           $colForm = 6;
+           $startCol = 1;
+        ?>
+        <form method="POST" action="addScoreProcess.php" id="frmAddScore" name="frmAddScore">
+            <table border="0" width="500">
+                <?php 
+                $isNewData = 1;
+                for($u=0;$u<=$cntArrow;) 
+                { 
+                    
+                ?>
+                <tr style="background-color: #d3d3d3">
+                    <?php while($startCol <= $colForm)
+                          { 
+                    ?>
+                    <td>Arrow-<?php echo $startCol;  ?></td>
+                    <?php
+                            $startCol++;                  
+                          } ?>
+                </tr>
+                <tr style="background-color: <?php echo ($startCol%2==2 ? "#999999" : "#E9E5FD") ?> ">
+                    <?php 
+                    $startCol -=6;
+                    while($startCol <= $colForm) 
+                        { 
+                        $strTxtBoxName= "txtBoxMark-".$startCol;
+                        $currMark = fnGetExistingRangeMark($_POST['txtBoxArcherNo'], $startCol, $_POST['slctCat']);
+                        $isNewData = ($currMark == '' ? 1 : 0 );
+                     ?>
+                    <td><input type="text" id="<?php echo $strTxtBoxName ?>" class="txtBoxMark" name="<?php echo $strTxtBoxName ?>" value="<?php echo $currMark; ?>" ></td>
+                    <?php 
+                          $startCol++;
+                        }
+                    
+                    ?>
+                </tr>
+                <?php
+                   $startCol = $colForm+1;
+                   $colForm += 6;
+                   $u = $colForm;
+                 }               
+                ?>
+                <tr><td colspan="6" align="center"><input type="submit" id="btnSave" name="btnSave" value="Save"><?php echo $isNewData;  ?>
+                        <input type="hidden" name="hidArchNo" id="hidArchNo" value="<?php echo strtoupper($_POST['txtBoxArcherNo']);  ?>">
+                        <input type="hidden" name="hidCatRange" id="hidCatRange" value="<?php echo $_POST['slctCat'];  ?>">
+                        <input type="hidden" name="hidCntArrow" id="hidCntArrow" value="<?php echo $cntArrow;  ?>">
+                        <input type="hidden" name="hidIsNewData" id="hidIsNewData" value="<?php echo $isNewData;  ?>">
+                    </td>
+                </tr>
+            </table>            
+        </form>
+        
+       <?php }   ?>
+        
+        <?php 
+           
+        function fnGetExistingRangeMark ($archerNo,$nthArrow,$rangeId)
+        {
+            global $db;
+            
+            $qrySelCat = "select score,cntX,cntM from scoring WHERE archer_no = :archer_no and Nth_arrow = :Nth_arrow and `range` = :range "; 
+            $fetchQry = $db->prepare($qrySelCat);
+            $fetchQry->execute(array(':archer_no'=> $archerNo, ':Nth_arrow' =>$nthArrow , ':range' =>$rangeId));
+            $recordSet = $fetchQry->fetch();
+           
+            $arrwMark = $recordSet['score'];
+            
+            if($arrwMark == null )
+                $arrwMark = '';
+            else if ($recordSet['cntX'] == 1)
+                $arrwMark = 'X';
+            else if ($recordSet['cntM'] == 1)
+                $arrwMark = 'M';
+            
+            return $arrwMark;
+        }
+        
+        ?>
+    </body>
+</html>

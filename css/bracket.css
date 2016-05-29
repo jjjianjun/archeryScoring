@@ -1,0 +1,83 @@
+main, ul {
+  display:flex;
+  line-height: 1.4em;
+  font-size:small;
+}
+
+.bracketCSS ul, .bracketCSS main {
+   display: -webkit-flex;
+}
+
+ul {
+  flex-direction:column;
+  width: 200px;
+  list-style:none;
+  padding:0;
+}
+
+li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+
+.game + li {
+  flex-grow:1;
+}
+
+li:first-child,li:last-child {
+  flex-grow:.5;
+}
+
+ul:nth-child(2) li {
+}
+
+.game {
+  padding-left:20px;
+  cursor: pointer;
+}
+
+.winner {
+  /*font-weight:bold;*/
+}
+
+.game span {
+  float:right;
+  margin-right:5px;
+}
+
+.game-top {
+  border-bottom:3px solid #aaa;
+}
+
+.game-top + li {
+  border-right:3px solid #aaa; min-height:40px;
+}
+
+.game-bottom {
+  border-top:3px solid #aaa;
+}
+
+.finalWinner, .firstWinner, .secondWinner, .thirdWinner {
+  font-weight:bold;
+  font-size: 20px;
+  padding-left:20px;
+  cursor: pointer;
+}
+
+.firstWinner span, .secondWinner span, .thirdWinner span{
+  float:right;
+  margin-right:500px;
+}
+
+#loading-image {
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	left: 45%;
+	top: 45%;
+	z-index: 1;
+}
+
+.panelTitle {
+	font-weight: bold;
+}

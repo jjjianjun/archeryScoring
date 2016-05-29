@@ -1,0 +1,108 @@
+<?php
+//include '../Connections/wifiAtt.php';
+include '../generalFn/genericFn.php';
+    fnClearTeamScore();
+
+    $stmtSelect = $db->prepare("select distinct(team) as TeamName from players ");          
+    $stmtSelect->execute();
+    $recordSetListTeam= $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($recordSetListTeam as $row) //only top 3 players from each team will be inserted into teamScore
+    {
+//        $stmtSelScore = $db->prepare("select archer_no,players.player_name,players.team,sum(score) as totMark from scoring,players 
+//                                    where scoring.archer_no = players.player_no and players.team = :player_team
+//                                    GROUP BY scoring.archer_no
+//                                    ORDER BY totMark desc
+//                                    limit 3 ");          
+//        $stmtSelScore->execute(array(':player_team'=>$row['TeamName']));
+        //$stmtSelScore->fetchAll(PDO::FETCH_ASSOC);
+        $recordSetPlayerScore= getTop3Players($row['TeamName']); 
+        
+        foreach ($recordSetPlayerScore as $rowPlayerScore)
+        {
+            $stmtinsertTeamScore = $db->prepare("insert into teamscores (memberArcherNo,memberScore) values (:memberArcherNo,:memberScore)");          
+            $stmtinsertTeamScore->execute(array(':memberArcherNo'=>$rowPlayerScore['archer_no'],':memberScore'=>$rowPlayerScore['totMark']));
+        }
+    }
+
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+        <link rel="stylesheet" href="../css/jquery-ui.css" />
+        <link rel="stylesheet" href="../css/style_1.css" />
+        <script type="text/javascript" src="../js/jquery-1.9.1.min.js" ></script>
+        <script type="text/javascript" src="../js/jquery-ui.js" ></script>
+    </head>
+    <body>
+        <div align="center">
+        <form method="POST" target="_blank" action="teamScoreProcess.php">
+            
+        <table border="0"  style="width: 75%;">          
+            <?php
+            $stmtSelect = $db->prepare("select bow_category from bowcategories ");          
+            $stmtSelect->execute();
+            $recordSet= $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+            
+            foreach ($recordSet as $row) 
+            {
+                ?>
+            <tr style="background-color:#95AAB4 ">
+                <td style="width: 3%">RANK</td>
+                <td colspan='2'>Category : <?php echo $row['bow_category'] ?></td>
+            </tr>
+            <?php
+               $qryScore = "select sum(memberScore) as TotalTeamScore, players.team as grpTeam from teamscores,players where teamscores.memberArcherNo = players.player_no and players.player_bow_cat = :player_bow_cat
+                            GROUP BY players.team
+                            ORDER BY TotalTeamScore desc";
+               $stmtSelectTeam = $db->prepare($qryScore);          
+               $stmtSelectTeam->execute(array(':player_bow_cat'=>$row['bow_category']));
+               $recordTeamScore= $stmtSelectTeam->fetchAll(PDO::FETCH_ASSOC);
+               $cntRank = 1;
+               foreach ($recordTeamScore as $rowTeamScore)
+               {
+                   ?>
+            <tr style="background-color:<?php echo ($cntRank%2==1 ? "#A1CCE4" : "#E9E5FD") ?>">
+                <td><?php echo $cntRank ?></td>
+                <td><?php echo $rowTeamScore['grpTeam'] ?></td>
+                <td><?php echo $rowTeamScore['TotalTeamScore'] ?></td>
+            </tr>
+              <?php 
+                $RecordSetPlayer = getTop3Players($rowTeamScore['grpTeam']);
+                foreach ($RecordSetPlayer as $rowPlayers)
+                {
+              ?>
+            <tr style="background-color:<?php echo ($cntRank%2==1 ? "#A1CCE4" : "#E9E5FD") ?>">
+                <td>&nbsp;</td>
+                <td><?php echo $rowPlayers['archer_no']."--"; ?><?php echo $rowPlayers['player_name']; ?></td>
+                <td><?php echo $rowPlayers['totMark']; ?></td>
+            </tr>
+            <?php
+                }
+            
+               $cntRank++;
+               }
+            ?>
+            <tr>
+                <td></td>
+            </tr>   
+            <?php    
+            }
+            ?>
+         
+            
+        </table></div>
+        </form>
+    </body>
+</html>
+<?php
+ function fnClearTeamScore()
+ {
+     global $db;
+     $stmtSelScore = $db->prepare("delete from teamscores");          
+     $stmtSelScore->execute();
+ }
+
+?>

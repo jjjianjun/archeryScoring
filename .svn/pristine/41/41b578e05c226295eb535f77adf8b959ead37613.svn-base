@@ -1,0 +1,120 @@
+<?php
+include '../Connections/wifiAtt.php';
+
+if(isset($_POST['btnSubmit']))
+  {
+    if($_POST['btnSubmit']=="Add Team" && $_POST['txtBoxTeamName'] != "")
+    {
+     $stmt = $db->prepare("INSERT into teams (teamCode) VALUES (:teamCode) ");
+     $stmt->execute(array(':teamCode' => $_POST['txtBoxTeamName']));
+    }
+    else if($_POST['btnSubmit']=="Add Bow Category" && $_POST['txtBoxBowCat'] != "")
+    {
+     $stmt = $db->prepare("INSERT into bowCategories (bow_category) VALUES (:bow_category) ");
+     $stmt->execute(array(':bow_category' => $_POST['txtBoxBowCat']));
+    }
+  }
+  
+  if(isset($_GET['action']))
+  {
+      if($_GET['action']=="deleteTeam")
+      {
+        $stmt = $db->prepare("delete from teams where pk =:pk ");
+        $stmt->execute(array(':pk' => $_GET['pk']));
+      }
+      else if ($_GET['action']=="deleteBowCat")
+      {
+        $stmt = $db->prepare("delete from bowcategories where pk =:pk ");
+        $stmt->execute(array(':pk' => $_GET['pk']));
+      }
+  }
+  
+  ?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+        <script type="text/javascript" src="../js/jquery-1.9.1.min.js" ></script>
+        <script type="text/javascript" src="../js/jquery-ui.js" ></script>
+        <link rel="stylesheet" href="../css/jquery-ui.css" />
+        <link rel="stylesheet" href="../css/style_1.css" />
+    </head>
+    <body>
+        <form method="POST" >
+        <table>
+            <tr>
+                <td>Team Name:</td>
+                <td><input type="text" id="txtBoxTeamName" name="txtBoxTeamName"></td>
+                <td><input type="submit" id="btnSubmit" name="btnSubmit" value="Add Team"></td>
+            </tr>
+            <tr>
+                <td>Bow Category:</td>
+                <td><input type="text" id="txtBoxBowCat" name="txtBoxBowCat"></td>
+                <td><input type="submit" id="btnSubmit" name="btnSubmit" value="Add Bow Category"></td>
+            </tr>
+        </table>
+        </form>
+        <?php
+            $stmtSelect = $db->prepare("SELECT * from teams ");
+            
+            $stmtSelect->execute();
+
+            $row_RecordsetTeam = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+            $cntRow = $stmtSelect -> rowCount();
+            if($cntRow >0)
+            {
+        ?>
+        <br>
+        <table>
+            <tr><td>Team List
+            <table>
+            <tr>
+                <td></td>
+                <td></td>             
+            </tr>
+            <?php
+                $cnt = 1;
+                foreach( $row_RecordsetTeam as $row)
+                {  ?>
+            <tr style="background-color:<?php echo ($cnt%2==1 ? "#A1CCE4" : "#E9E5FD") ?> ">
+                <td><?php echo $cnt; ?></td>
+                <td><?php echo $row['TeamCode'];   ?></td>
+                <td><a href="ListAddTeam.php?action=deleteTeam&pk=<?php echo $row['pk']  ?>">Delete</a></td>
+            </tr>    
+            <?php
+                $cnt++;
+                }
+            ?>
+           </table></td>
+           <td>Bow Categories
+               <table>
+                   <tr>
+                       <td></td>
+                       <td></td> 
+                   </tr>
+                   <?php  
+                    $stmtSelect = $db->prepare("SELECT * from bowcategories ");         
+                    $stmtSelect->execute();
+                    $row_RecordsetBowCat = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+                    $cnt2 = 1;
+                    foreach ($row_RecordsetBowCat as $row)
+                    {  ?>
+                     <tr style="background-color:<?php echo ($cnt2%2==1 ? "#A1CCE4" : "#E9E5FD") ?> ">
+                        <td><?php echo $cnt2; ?></td>
+                        <td><?php echo $row['bow_category'];   ?></td>
+                        <td><a href="ListAddTeam.php?action=deleteBowCat&pk=<?php echo $row['pk']  ?>">Delete</a></td>
+                    </tr>   
+                    <?php  
+                    $cnt2++;
+                    }
+                   ?>
+               </table>
+           </td>
+            </tr>
+        </table>
+        <?php
+            }
+        ?>
+    </body>
+</html>

@@ -1,0 +1,45 @@
+<?php
+
+session_start();
+if(isset($_REQUEST['Submit'])){	
+    
+	if($_REQUEST['username'] == "" || $_REQUEST['password'] == ""){
+		$code_error = 1;
+		header("Location: index.php?error=" . $code_error);
+	}
+	else{
+		userLogin($_REQUEST['username'], $_REQUEST['password']);
+	}			
+}
+
+ini_set('display_errors', 1); 
+error_reporting(E_ALL);
+//session_start();
+function userLogin($username, $password){
+
+include 'Connections/wifiAtt.php';  
+
+$stmt = $db->prepare("SELECT * from staf where staff_id=:staff_id and staff_password=:staff_password");
+$encryptedStr = encrypt($password);
+$stmt->execute(array(':staff_id' => $username, ':staff_password' => encrypt($password)));
+
+$row_RecordsetAdmin = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//$plainPwd = decrypt($row_RecordsetAdmin['staff_password']);
+//$resuult = strcmp($row_RecordsetAdmin['staff_password'], $encryptedStr);
+    foreach ($row_RecordsetAdmin as $row){ 
+    if($row['staff_id'] == $username && $row['staff_password'] == $encryptedStr ){
+                    //session_start();
+        $userIdFromDb = $row['staff_id'];
+            $_SESSION['user'] = "Superuser";
+            $_SESSION['userID'] = $row['staff_id'];
+            header("Location: index2.php");
+            
+      }
+      else{ 
+           $code_error = 1;
+                    header("Location: index.php?error=" . $code_error);
+            }
+        }
+}
+?>

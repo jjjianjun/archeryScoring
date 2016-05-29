@@ -1,0 +1,69 @@
+<?php
+include '../Connections/wifiAtt.php';
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="../css/jquery-ui.css" />
+        <link rel="stylesheet" href="../css/style_1.css" />
+        <script type="text/javascript" src="../js/jquery-1.9.1.min.js" ></script>
+        <script type="text/javascript" src="../js/jquery-ui.js" ></script>
+        
+        <title></title>
+    </head>
+    <body>
+        
+        <table>          
+            <?php
+            $stmtSelect = $db->prepare("SELECT * from category ");
+            
+            $stmtSelect->execute();
+
+            $recordSetCategory = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+            $cntRow = $stmtSelect -> rowCount();
+            
+        ?>
+            <form method="POST" target="_blank" action="viewScoreProcess.php">
+            <tr>
+                <td>Range Category: </td>
+                <td><select id="slctCat" name="slctCat" >
+                        <?php foreach ($recordSetCategory as $rowCat) {   ?>
+                        <option value="<?php echo $rowCat['range_Id'] ?>"><?php echo $rowCat['range']."-".$rowCat['categories'] ?></option>   
+                        <?php  } ?>
+                    </select></td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center"><input type="submit" id="btnSubmit" name="btnSubmit" value="View Score" ></td>
+            </tr>
+            </form>
+            
+            <form method="POST" target="_blank" action="viewScoreProcessByCat.php">
+               
+            <?php
+            $stmtSelect = $db->prepare("SELECT distinct(player_bow_cat) as ListBowCat from players Order by ListBowCat");
+            
+            $stmtSelect->execute();
+
+            $recordSetCategory = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+            
+            
+            ?>
+            <tr>
+                <td> Category: </td>
+                <td><select id="slctCat" name="slctCat" >                      
+                        <?php foreach ($recordSetCategory as $rowCat) {   ?>
+                        <option value="<?php echo $rowCat['ListBowCat'] ?>"><?php echo $rowCat['ListBowCat'] ?></option>   
+                        <?php  } ?>
+                    </select></td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center"><input type="submit" id="btnSubmit" name="btnSubmit" value="View Score" ></td>
+            </tr>
+            </form>
+        </table>
+        
+        
+        
+    </body>
+</html>
