@@ -630,7 +630,7 @@
 		</div>
 	</div>
 </div>	
-<button class="btn btn-primary" id="buttonGenerateImage" onclick="exportToImage()">Export to Image</button>
+<!--button class="btn btn-primary" id="buttonGenerateImage" onclick="exportToImage()">Export to Image</button-->
 <div class="modal fade bs-example-modal-lg" id="modalAddScoreOR" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
 	<div class="modal-dialog modal-lg">
 	<div class="modal-content">
