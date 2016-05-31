@@ -3,7 +3,7 @@
 session_start();
 if(isset($_SESSION['userID'])){ 
     
-    $qStaf = "SELECT * FROM staf where staff_id = '$_SESSION[userID]'";
+    $qStaf = "SELECT * FROM staff where staff_id = '$_SESSION[userID]'";
     $Staf = mysqli_query($wifiAtt,$qStaf) or die(mysqli_error());
     $row_qStaf = mysqli_fetch_assoc($Staf);
 ?>

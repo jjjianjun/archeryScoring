@@ -139,7 +139,8 @@ include '../Connections/wifiAtt.php';
 		$stmtDeleteScoreOR->execute(array(':archer_no' => $archer_no, ':range_Id' => $range_Id, ':round_no' => $selectedRoundNum, ':Nth_arrow' => $Nth_arrow));
 		$deletedRowCount = $stmtDeleteScoreOR->rowCount();
 		
-		$cntX = fnCntFreq($score,"X");
+		//$cntX = fnCntFreq($score,"X");
+		$cntX = 0;
 		$cnt10 = fnCntFreq($score, "10");
 		$cnt9 = fnCntFreq($score, "9");
 		$cntM = fnCntFreq($score, "M");
@@ -399,6 +400,7 @@ include '../Connections/wifiAtt.php';
 		$deletedRowCount = $stmtDeleteScoreOR->rowCount();
 		
 		$cntX = fnCntFreq($score,"X");
+		$cntX = 0;
 		$cnt10 = fnCntFreq($score, "10");
 		$cnt9 = fnCntFreq($score, "9");
 		$cntM = fnCntFreq($score, "M");

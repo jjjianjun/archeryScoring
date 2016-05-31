@@ -47,7 +47,7 @@ if(isset($_POST))
                 <th>Archer Name</th>
                 <th>Team</th>
                 <th class="rptColumn">Total Score</th>
-                <th class="rptColumn">X</th>
+                <th class="rptColumn" style="display:none;">X</th>
                 <th class="rptColumn">10</th>
                 <th class="rptColumn">9</th>
                 <th class="rptColumn">Miss</th>
@@ -66,7 +66,7 @@ if(isset($_POST))
                 <td><?php echo $recordSetArcher['player_name'] ?></td>
                 <td><?php echo $recordSetArcher['team'] ?></td>
                 <td class="rptColumn"><?php echo $eachRow['totalMark'] ?></td>
-                <td class="rptColumn"><?php echo $eachRow['totalX'] ?></td>
+                <td class="rptColumn" style="display:none;"><?php echo $eachRow['totalX'] ?></td>
                 <td class="rptColumn"><?php echo $eachRow['total10'] ?></td>
                 <td class="rptColumn"><?php echo $eachRow['total9'] ?></td>
                 <td class="rptColumn"><?php echo $eachRow['totalM'] ?></td>

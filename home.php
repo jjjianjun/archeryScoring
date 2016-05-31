@@ -261,7 +261,7 @@ margin-top: 10px;
 					<li onclick="showPageTitle('Team Olympic Round')"><a href="olympicRoundModule/groupOR.php" target="content">Team OR</a></li>
 				  </ul>
 				</li>	
-				<li style="display:none;" onclick="showPageTitle('Archive & Clear Database')"><a href="archiveDbModule/archiveDb.php" target="content">Archive & Clear Db<span style="font-size:16px;" class="pull-right hidden-xs showopacity glyphicon glyphicon-folder-close"></span></a></li> 				
+				<li onclick="showPageTitle('Archive & Clear Database')"><a href="archiveDbModule/archiveDb.php" target="content">Archive & Clear Db<span style="font-size:16px;" class="pull-right hidden-xs showopacity glyphicon glyphicon-folder-close"></span></a></li> 				
 				<li><a href="authenticationModule/logout.php">Logout<span style="font-size:16px;" class="pull-right hidden-xs showopacity glyphicon glyphicon-log-out"></span></a></li> 				
 			  </ul>
 			</div>
